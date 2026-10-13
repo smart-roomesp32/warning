@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ Thống Giám Sát Thông Minh - SmartHome ESP32</title>
-    <!-- Tailwind CSS để giao diện đẹp và hiện đại -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- SheetJS (xlsx) để hỗ trợ xuất file Excel -->
+    <!-- SheetJS (xlsx) để xuất file Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Firebase SDK v8 (Tương thích tốt với Realtime Database qua CDN) -->
+    <!-- Firebase SDK v8 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
@@ -39,29 +39,25 @@
 
         <!-- Thẻ Thống Kê Thông Số -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Điện áp -->
             <div class="bg-white p-5 rounded-lg shadow border-l-4 border-blue-500">
                 <p class="text-gray-500 text-sm">Điện Áp (Voltage)</p>
                 <h3 class="text-3xl font-bold text-gray-800 mt-1"><span id="val-voltage">--</span> <span class="text-lg font-normal text-gray-500">V</span></h3>
             </div>
-            <!-- Dòng điện -->
             <div class="bg-white p-5 rounded-lg shadow border-l-4 border-green-500">
                 <p class="text-gray-500 text-sm">Dòng Điện (Current)</p>
                 <h3 class="text-3xl font-bold text-gray-800 mt-1"><span id="val-current">--</span> <span class="text-lg font-normal text-gray-500">A</span></h3>
             </div>
-            <!-- Công suất -->
             <div class="bg-white p-5 rounded-lg shadow border-l-4 border-yellow-500">
                 <p class="text-gray-500 text-sm">Công Suất (Power)</p>
                 <h3 class="text-3xl font-bold text-gray-800 mt-1"><span id="val-power">--</span> <span class="text-lg font-normal text-gray-500">W</span></h3>
             </div>
-            <!-- Trạng thái thiết bị -->
             <div class="bg-white p-5 rounded-lg shadow border-l-4 border-purple-500">
                 <p class="text-gray-500 text-sm">Trạng Thái Hệ Thống</p>
                 <h3 id="val-status" class="text-xl font-bold text-green-600 mt-2">Đang kết nối...</h3>
             </div>
         </div>
 
-        <!-- Bảng Trạng Thái Cảm Biến -->
+        <!-- Trạng Thái Cảm Biến & Tiện Ích -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-white p-5 rounded-lg shadow space-y-4">
                 <h3 class="font-bold text-gray-700 text-lg border-b pb-2">Trạng Thái Cảm Biến Thời Gian Thực</h3>
@@ -78,14 +74,14 @@
             <div class="bg-white p-5 rounded-lg shadow flex flex-col justify-between">
                 <div>
                     <h3 class="font-bold text-gray-700 text-lg border-b pb-2">Điều Khiển & Tiện Ích Web</h3>
-                    <p class="text-sm text-gray-500 mt-2">Trang web hỗ trợ phát âm thanh cảnh báo trực tiếp qua loa thiết bị khi nhận dữ liệu lỗi từ ESP32.</p>
+                    <p class="text-sm text-gray-500 mt-2">Lịch sử sự kiện được đồng bộ trực tiếp từ Firebase /HistoryLogs, bạn có thể xuất Excel bất cứ lúc nào.</p>
                 </div>
                 <div class="mt-4 flex space-x-3">
                     <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded shadow font-medium transition flex items-center space-x-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         <span>Xuất File Excel Sự Kiện</span>
                     </button>
-                    <button onclick="clearHistory()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded shadow font-medium transition">
+                    <button onclick="clearHistory()" class="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded shadow font-medium transition">
                         Xóa Lịch Sử
                     </button>
                 </div>
@@ -95,8 +91,8 @@
         <!-- Bảng Lịch Sử Sự Kiện Cảnh Báo -->
         <div class="bg-white rounded-lg shadow overflow-hidden">
             <div class="px-6 py-4 border-b flex justify-between items-center">
-                <h3 class="font-bold text-gray-700 text-lg">Lịch Sử Sự Kiện & Cảnh Báo</h3>
-                <span class="text-xs text-gray-400">Tự động ghi nhận khi xảy ra thay đổi trạng thái</span>
+                <h3 class="font-bold text-gray-700 text-lg">Lịch Sử Sự Kiện & Cảnh Báo (Đồng bộ Firebase)</h3>
+                <span class="text-xs text-gray-400">Tự động ghi nhận và lưu trữ</span>
             </div>
             <div class="overflow-x-auto max-h-80">
                 <table class="w-auto min-w-full text-left border-collapse">
@@ -109,7 +105,7 @@
                         </tr>
                     </thead>
                     <tbody id="event-log-table" class="text-gray-700 text-sm divide-y divide-gray-200">
-                        <!-- Dữ liệu sự kiện sẽ được thêm động tại đây -->
+                        <!-- Dữ liệu được tải từ Firebase -->
                     </tbody>
                 </table>
             </div>
@@ -122,9 +118,8 @@
         Hệ thống IoT Giám Sát Điện Năng & An Toàn - Xây dựng cho ESP32 & Firebase
     </footer>
 
-    <!-- Script Xử Lý Logic Firebase & Âm Thanh & Excel -->
+    <!-- Script Xử Lý -->
     <script>
-        // Cấu hình Firebase của bạn
         const firebaseConfig = {
             databaseURL: "https://smarthome-esp32-337d6-default-rtdb.firebaseio.com/"
         };
@@ -132,11 +127,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Biến lưu trữ sự kiện phục vụ xuất Excel
         let eventLogs = [];
-        let logCounter = 1;
-
-        // Âm thanh cảnh báo dùng Web Audio API (Không cần file nhạc ngoài)
         let audioCtx = null;
         let isWebBuzzerActive = false;
         let buzzerInterval = null;
@@ -153,7 +144,7 @@
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
             osc.type = 'sine';
-            osc.frequency.value = 880; // Tần số tiếng kêu (nốt La)
+            osc.frequency.value = 880;
             gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -184,27 +175,24 @@
             }
         }
 
-        // Cập nhật Đồng hồ thời gian thực
+        // Đồng hồ thời gian thực
         setInterval(() => {
             const now = new Date();
             document.getElementById('realtime-clock').innerText = now.toLocaleString('vi-VN');
         }, 1000);
 
-        // Lắng nghe dữ liệu từ Firebase node /SmartHome
+        // --- LẮNG NGHE DỮ LIỆU THỜI GIAN THỰC TỪ /SmartHome ---
         const smartHomeRef = db.ref('/SmartHome');
-        
-        let lastStatus = "";
 
         smartHomeRef.on('value', (snapshot) => {
             const data = snapshot.val();
             if (!data) return;
 
-            // Hiển thị thông số điện năng
             document.getElementById('val-voltage').innerText = data.voltage !== undefined ? data.voltage.toFixed(1) : "--";
             document.getElementById('val-current').innerText = data.current !== undefined ? data.current.toFixed(1) : "--";
             document.getElementById('val-power').innerText = data.power !== undefined ? data.power.toFixed(1) : "--";
 
-            // Trạng thái chuyển động (PIR)
+            // PIR
             const motionEl = document.getElementById('status-motion');
             if (data.motion === 1) {
                 motionEl.innerText = "Phát hiện có người";
@@ -214,7 +202,7 @@
                 motionEl.className = "px-3 py-1 rounded text-sm font-semibold bg-gray-200 text-gray-700";
             }
 
-            // Trạng thái khói (Smoke - Active LOW)
+            // Smoke
             const smokeEl = document.getElementById('status-smoke');
             if (data.smoke === 0) {
                 smokeEl.innerText = "CÓ KHÓI / NGUY HIỂM";
@@ -224,7 +212,6 @@
                 smokeEl.className = "px-3 py-1 rounded text-sm font-semibold bg-green-100 text-green-700";
             }
 
-            // Trạng thái tổng quát & Cảnh báo banner
             const statusEl = document.getElementById('val-status');
             const bannerEl = document.getElementById('alert-banner');
             const alertTitle = document.getElementById('alert-title');
@@ -235,69 +222,77 @@
             if (data.statusText && data.statusText !== "AN TOAN") {
                 bannerEl.classList.remove('hidden');
                 alertTitle.innerText = "CẢNH BÁO: " + data.statusText;
-                alertDesc.innerText = "Hệ thống ghi nhận sự kiện lúc " + new Date().toLocaleTimeString('vi-VN');
+                alertDesc.innerText = "Hệ thống ghi nhận sự cố khẩn cấp.";
                 statusEl.className = "text-xl font-bold text-red-600 mt-2 animate-pulse";
 
-                // Tự động bật còi trên web nếu chưa bật
-                if (!isWebBuzzerActive) {
-                    toggleWebBuzzer();
-                }
-
-                // Ghi nhận lịch sử nếu trạng thái thay đổi
-                if (data.statusText !== lastStatus) {
-                    addEventLog(data.statusText, "Nguy hiểm / Cảnh báo");
-                    lastStatus = data.statusText;
-                }
+                if (!isWebBuzzerActive) toggleWebBuzzer();
             } else {
                 bannerEl.classList.add('hidden');
                 statusEl.className = "text-xl font-bold text-green-600 mt-2";
-                if (isWebBuzzerActive) {
-                    toggleWebBuzzer(); // Tắt còi khi an toàn trở lại
-                }
-                if (lastStatus !== "AN TOAN") {
-                    addEventLog("Hệ thống trở lại trạng thái An Toàn", "Thông tin");
-                    lastStatus = "AN TOAN";
-                }
+                if (isWebBuzzerActive) toggleWebBuzzer();
             }
         });
 
-        // Thêm dòng lịch sử sự kiện
-        function addEventLog(message, level) {
-            const timeStr = new Date().toLocaleString('vi-VN');
-            eventLogs.push({
-                stt: logCounter++,
-                time: timeStr,
-                event: message,
-                level: level
-            });
+        // --- LẮNG NGHE LỊCH SỬ TỪ /HistoryLogs (Đồng bộ chuẩn Object Firebase) ---
+        const historyRef = db.ref('/HistoryLogs');
 
+        historyRef.orderByChild('timestamp').on('value', (snapshot) => {
             const tbody = document.getElementById('event-log-table');
-            const row = document.createElement('tr');
-            row.className = level.includes("Nguy hiểm") ? "bg-red-50 hover:bg-red-100" : "hover:bg-gray-50";
-            row.innerHTML = `
-                <td class="py-3 px-6 border-b">${eventLogs[eventLogs.length - 1].stt}</td>
-                <td class="py-3 px-6 border-b">${timeStr}</td>
-                <td class="py-3 px-6 border-b font-medium">${message}</td>
-                <td class="py-3 px-6 border-b"><span class="px-2 py-1 rounded text-xs ${level.includes('Nguy hiểm') ? 'bg-red-200 text-red-800' : 'bg-blue-200 text-blue-800'}">${level}</span></td>
-            `;
-            tbody.insertBefore(row, tbody.firstChild); // Đưa sự kiện mới nhất lên đầu bảng
-        }
-
-        // Xóa lịch sử
-        function clearHistory() {
+            tbody.innerHTML = '';
             eventLogs = [];
-            logCounter = 1;
-            document.getElementById('event-log-table').innerHTML = '';
+            
+            const data = snapshot.val();
+            if (!data) return;
+
+            let logsArray = Object.keys(data).map(key => ({
+                id: key,
+                ...data[key]
+            }));
+
+            // Sắp xếp tăng dần theo thời gian timestamp
+            logsArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+            let stt = 1;
+            logsArray.forEach((log) => {
+                let timeDisplay = log.time || new Date(log.timestamp).toLocaleString('vi-VN');
+
+                eventLogs.push({
+                    stt: stt,
+                    time: timeDisplay,
+                    event: log.event,
+                    level: log.level
+                });
+
+                const row = document.createElement('tr');
+                const isDanger = log.level && log.level.includes("Nguy hiểm");
+                row.className = isDanger ? "bg-red-50 hover:bg-red-100" : "hover:bg-gray-50";
+                row.innerHTML = `
+                    <td class="py-3 px-6 border-b">${stt}</td>
+                    <td class="py-3 px-6 border-b">${timeDisplay}</td>
+                    <td class="py-3 px-6 border-b font-medium">${log.event || "Không rõ sự kiện"}</td>
+                    <td class="py-3 px-6 border-b"><span class="px-2 py-1 rounded text-xs ${isDanger ? 'bg-red-200 text-red-800' : 'bg-blue-200 text-blue-800'}">${log.level || "Thông tin"}</span></td>
+                `;
+                tbody.insertBefore(row, tbody.firstChild); // Đưa sự kiện mới nhất lên trên cùng
+                stt++;
+            });
+        });
+
+        // Xóa lịch sử trên Firebase
+        function clearHistory() {
+            if (confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử cảnh báo trên Database không?")) {
+                historyRef.remove().then(() => {
+                    alert("Đã xóa sạch lịch sử!");
+                });
+            }
         }
 
-        // Xuất ra file Excel bằng SheetJS
+        // Xuất file Excel từ danh sách lịch sử hiện có
         function exportToExcel() {
             if (eventLogs.length === 0) {
                 alert("Chưa có sự kiện nào để xuất file!");
                 return;
             }
 
-            // Chuyển đổi dữ liệu sang định dạng SheetJS
             const wsData = [
                 ["STT", "Thời Gian", "Sự Kiện", "Mức Độ"]
             ];
@@ -307,9 +302,8 @@
 
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(wsData);
-            XLSX.utils.book_append_sheet(wb, ws, "LichSuSuKien");
+            XLSX.utils.book_append_sheet(wb, ws, "LichSuCanhBao");
 
-            // Tải file xuống máy tính
             XLSX.writeFile(wb, "LichSuCanhBao_SmartHome.xlsx");
         }
     </script>
